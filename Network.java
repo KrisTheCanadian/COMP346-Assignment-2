@@ -351,9 +351,10 @@ public class Network extends Thread {
      * @param inPacket transaction transferred from the client
      * 
      */
-        public static boolean send(Transactions inPacket)
+        public static boolean send(Transactions inPacket/*, int inputIndexCLient*/)
         {
-        	
+        	//inputIndexClient set/get has race conditions
+            //send() also has race conditions w/ set inputIndexClient
         		  inComingPacket[inputIndexClient].setAccountNumber(inPacket.getAccountNumber());
         		  inComingPacket[inputIndexClient].setOperationType(inPacket.getOperationType());
         		  inComingPacket[inputIndexClient].setTransactionAmount(inPacket.getTransactionAmount());
@@ -387,7 +388,8 @@ public class Network extends Thread {
      */
          public static boolean receive(Transactions outPacket)
         {
-
+            //inputIndexClient set/get has race conditions
+            //send() also has race conditions w/ set inputIndexClient
         		 outPacket.setAccountNumber(outGoingPacket[outputIndexClient].getAccountNumber());
         		 outPacket.setOperationType(outGoingPacket[outputIndexClient].getOperationType());
         		 outPacket.setTransactionAmount(outGoingPacket[outputIndexClient].getTransactionAmount());
@@ -424,7 +426,8 @@ public class Network extends Thread {
      */
          public static boolean transferOut(Transactions outPacket)
         {
-	   	
+            //inputIndexClient set/get has race conditions
+            //send() also has race conditions w/ set inputIndexClient
         		outGoingPacket[inputIndexServer].setAccountNumber(outPacket.getAccountNumber());
         		outGoingPacket[inputIndexServer].setOperationType(outPacket.getOperationType());
         		outGoingPacket[inputIndexServer].setTransactionAmount(outPacket.getTransactionAmount());
@@ -459,7 +462,8 @@ public class Network extends Thread {
      */
        public static boolean transferIn(Transactions inPacket)
         {
-	
+            //inputIndexClient set/get has race conditions
+            //send() also has race conditions w/ set inputIndexClient
     		     inPacket.setAccountNumber(inComingPacket[outputIndexServer].getAccountNumber());
     		     inPacket.setOperationType(inComingPacket[outputIndexServer].getOperationType());
     		     inPacket.setTransactionAmount(inComingPacket[outputIndexServer].getTransactionAmount());
@@ -472,7 +476,7 @@ public class Network extends Thread {
             
     		     setoutputIndexServer(((getoutputIndexServer() + 1) % getMaxNbPackets()));	/* Increment the input buffer index for the server */
     		     /* Check if input buffer is empty */
-    		     if ( getoutputIndexServer( ) == getinputIndexClient( ))
+             if ( getoutputIndexServer( ) == getinputIndexClient( ))
     		     {
     		    	 setInBufferStatus("empty");
                 
@@ -556,11 +560,17 @@ public class Network extends Thread {
      */
     public void run()
     {	
-    	/* System.out.println("\n DEBUG : Network.run() - starting network thread"); */
+    	System.out.println("\n DEBUG : Network.run() - starting network thread");
     	
     	while (true)
     	{
-    		/*................................................................................................................................................................*/
-    	}    
+            if(clientConnectionStatus.equals("disconnected") && serverConnectionStatus.equals("disconnected")){
+                System.out.println("\n Terminating network thread - Client disconnected Server disconnected");
+                return;
+            }
+            else{
+                Thread.yield();
+            }
+        }
     }
 }
