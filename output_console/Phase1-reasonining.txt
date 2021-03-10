@@ -1,0 +1,3 @@
+I used statement synchronization because both functions withdraw and deposit are modifying account numbers. 
+If those methods were to be synchronized, there would still be a descrepency when both threads are overriding the same account.
+That is why i decided to synchronize the account object instead.
