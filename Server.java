@@ -270,12 +270,13 @@ public class Server extends Thread {
                         trans.setTransactionStatus("done");
                     }
                 }
-            }
+
 
             //System.out.println("\n DEBUG : Server.processTransactions() - transferring out account " + trans.getAccountNumber());
 
             Network.transferOut(trans);                                    /* Transfer a completed transaction from the server to the network output buffer */
             setNumberOfTransactions((getNumberOfTransactions() + 1));    /* Count the number of transactions processed */
+            }
 
         }
 
