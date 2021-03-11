@@ -1,0 +1,2 @@
+The semephores methods are more versatile than your typical locks and do not have a great performance overhead.
+Both runtimes were around 450 ms which is very fast.
